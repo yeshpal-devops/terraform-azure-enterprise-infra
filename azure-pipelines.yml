@@ -3,8 +3,8 @@ pool: Babaji
 
 stages:
   - stage: stage1
-    displayName: welcome stage 2
-
+    displayName: welcome stage 1
+    
     jobs:
       - job: job1
         displayName: welcome to job 1
@@ -17,3 +17,16 @@ stages:
               
               echo Hello world
 
+
+  - stage: stage2
+    displayName: welcome stage 2
+    jobs:
+      - job: job2
+        displayName: welcome to job 2
+        steps:
+        - task: CmdLine@2
+          inputs:
+            script: |
+              echo Write your commands here
+              
+              echo Hello world
