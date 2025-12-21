@@ -1,15 +1,19 @@
 trigger: none
 pool: Babaji
 
-jobs:
-  - job: job1
-    displayName: welcome to job 1
-    steps:
-    - task: CmdLine@2
-      displayName: Welcome to Valenta 
-      inputs:
-        script: |
-          echo Write your commands here
-          
-          echo Hello world
+stages:
+  - stage: stage1
+    displayName: welcome stage 2
+
+    jobs:
+      - job: job1
+        displayName: welcome to job 1
+        steps:
+        - task: CmdLine@2
+          displayName: Welcome to Valenta 
+          inputs:
+            script: |
+              echo Write your commands here
+              
+              echo Hello world
 
