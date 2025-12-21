@@ -4,8 +4,10 @@ pool: Babaji
 
 steps:
 - task: CmdLine@2
+  displayName: Welcome to Valenta 
   inputs:
     script: |
       echo Write your commands here
       
       echo Hello world
+
