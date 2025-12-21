@@ -61,8 +61,8 @@ stages:
           - task: ManualValidation@1
             displayName: Manual Validation
             inputs:
-              notifyUsers: 'yeshpal2035@gmail.com'
-              approvers: 'yeshpal2035@gmail.com'
+              notifyUsers: 'yashpal2035@gmail.com'
+              approvers: 'yashpal2035@gmail.com'
 
   - stage: DeploymentStage
     displayName: Deployment Stage
