@@ -30,3 +30,36 @@ stages:
               echo Write your commands here
               
               echo Hello world
+
+  - stage: stage3
+    displayName: welcome stage 3
+    jobs:
+      - job: job3
+        displayName: welcome to job 3
+        steps:
+
+        - task: TerraformInstaller@1
+          inputs:
+            terraformVersion: 'latest'
+
+        - task: TerraformTask@5
+          displayName: terraform init
+          inputs:
+            provider: 'azurerm'
+            command: 'init'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
+            backendServiceArm: 'ado-cicd'
+            backendAzureRmResourceGroupName: 'stgforbackend'
+            backendAzureRmStorageAccountName: 'stgforbackend'
+            backendAzureRmContainerName: 'container'
+            backendAzureRmKey: 'yash.tfstate'
+
+        - task: TerraformTask@5
+          displayName: terraform plan
+          inputs:
+            provider: 'azurerm'
+            command: 'plan'
+            workingDirectory: '$(System.DefaultWorkingDirectory)Environment/Dev'
+            environmentServiceNameAzureRM: 'ado-cicd'
+
+       
