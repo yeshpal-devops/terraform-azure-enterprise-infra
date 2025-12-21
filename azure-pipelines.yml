@@ -1,76 +1,11 @@
-trigger:
-- main
+trigger: none
+pool: Babaji
 
-pool:
-  name: Babaji   # self-hosted agent pool
 
 steps:
-# -------------------------
-# Sanity checks
-# -------------------------
-- script: echo "Hello from Azure DevOps"
-  displayName: '🧪 Sanity Check: Hello World'
-
-- script: |
-    echo "Repo: $(Build.Repository.Name)"
-    echo "Branch: $(Build.SourceBranchName)"
-    echo "Agent: $(Agent.Name)"
-  displayName: '🧪 Sanity Check: Repo & Agent Info'
-
-# -------------------------
-# Install Terraform
-# -------------------------
-- task: TerraformInstaller@1
-  displayName: '⬇️ Install Terraform (Latest)'
+- task: CmdLine@2
   inputs:
-    terraformVersion: 'latest'
-
-# -------------------------
-# Terraform INIT
-# -------------------------
-- task: TerraformTask@5
-  displayName: '🚀 Terraform INIT (Backend Setup)'
-  inputs:
-    provider: 'azurerm'
-    command: 'init'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-    backendServiceArm: 'ado-terraform-sp'
-    backendAzureRmOverrideSubscriptionID: '03f880af-35ca-4446-baab-0a4d320d633f'
-    backendAzureRmResourceGroupName: 'yash-ADO'
-    backendAzureRmStorageAccountName: 'asustuf'
-    backendAzureRmContainerName: 'asustuf'
-    backendAzureRmKey: 'terraform.tfstate'
-
-# -------------------------
-# Terraform VALIDATE
-# -------------------------
-- task: TerraformTask@5
-  displayName: '✅ Terraform VALIDATE (Syntax Check)'
-  inputs:
-    provider: 'azurerm'
-    command: 'validate'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-
-# -------------------------
-# Terraform PLAN
-# -------------------------
-- task: TerraformTask@5
-  displayName: '📋 Terraform PLAN (Preview Changes)'
-  inputs:
-    provider: 'azurerm'
-    command: 'plan'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-    environmentServiceNameAzureRM: 'ado-terraform-sp'
-    environmentAzureRmOverrideSubscriptionID: '03f880af-35ca-4446-baab-0a4d320d633f'
-
-# -------------------------
-# Terraform APPLY
-# -------------------------
-- task: TerraformTask@5
-  displayName: '🔥 Terraform APPLY (Deploy Infrastructure)'
-  inputs:
-    provider: 'azurerm'
-    command: 'apply'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-    environmentServiceNameAzureRM: 'ado-terraform-sp'
-    environmentAzureRmOverrideSubscriptionID: '03f880af-35ca-4446-baab-0a4d320d633f'
+    script: |
+      echo Write your commands here
+      
+      echo Hello world
