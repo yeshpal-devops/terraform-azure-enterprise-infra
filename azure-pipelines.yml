@@ -56,23 +56,10 @@ stages:
         - publish: $(System.DefaultWorkingDirectory)/Environment/Dev/tfplan
           artifact: terraform-plan
 
-# ================= MANUAL APPROVAL =================
-- stage: ManualValidationStage
-  displayName: Manual Validation
-  dependsOn: PlanningStage
-  pool: server
-  jobs:
-    - job: Approval
-      steps:
-        - task: ManualValidation@1
-          inputs:
-            notifyUsers: 'yashpal2035@gmail.com'
-            approvers: 'yashpal2035@gmail.com'
-
 # ================= DEPLOYMENT =================
 - stage: DeploymentStage
   displayName: Deployment Stage
-  dependsOn: ManualValidationStage
+  dependsOn: PlanningStage
   jobs:
     - job: DeploymentJob
       displayName: Terraform Apply
