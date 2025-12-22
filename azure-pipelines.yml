@@ -85,6 +85,6 @@ stages:
           inputs:
             provider: 'azurerm'
             command: 'apply'
-            commandOptions: '-auto-approve tfplan'
+            commandOptions: '-auto-approve'
             workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
             environmentServiceNameAzureRM: 'ado-cicd'
