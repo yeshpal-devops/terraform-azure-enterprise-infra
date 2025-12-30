@@ -2,29 +2,34 @@ trigger: none
 
 pool: Babaji
 
-jobs:
-  - job: jobno01
-    displayName: job-no-01
+stages:
+  - stage: as001
+    displayName: stage001
+    jobs:
+      - job: jobno01
+        displayName: job-no-01
 
-    steps:
-    - task: CmdLine@2
+        steps:
+        - task: CmdLine@2
 
-      displayName: task001
-      inputs:
-        script: |
-          echo Write your commands here
-          
-          echo Hello Guys!!
 
-    - task: CmdLine@2
-      displayName: task002
-      inputs:
-        script: 'echo Hello world'
+          displayName: task001
+          inputs:
+            script: |
+              echo Write your commands here
+              
+              echo Hello Guys!!
 
-  - job: jobno02
-    dependsOn: jobno01
-    displayName: job-no-02
-    steps:
-     - task: CmdLine@2
-       inputs:
-         script: 'echo Hello boss'
+        - task: CmdLine@2
+          displayName: task002
+          inputs:
+            script: 'echo Hello world'
+
+  - stage: as002
+    jobs:
+    - job: jobno02
+      displayName: job-no-02
+      steps:
+      - task: CmdLine@2
+        inputs:
+          script: 'echo Hello boss'
