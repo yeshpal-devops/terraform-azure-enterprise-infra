@@ -22,6 +22,7 @@ jobs:
         script: 'echo Hello world'
 
   - job: jobno02
+    dependsOn: jobno01
     displayName: job-no-02
     steps:
      - task: CmdLine@2
