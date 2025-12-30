@@ -12,3 +12,18 @@ steps:
       
       echo Hello Guys!!
 
+- task: CmdLine@2
+  displayName: task002
+  inputs:
+    script: 'echo Hello world'
+
+- task: CmdLine@2
+  displayName: task003
+  inputs:
+    script: 'echo Chandigarh'
+
+
+- task: CmdLine@2
+  displayName: task004
+  inputs:
+    script: 'echo Hello Mohali'
