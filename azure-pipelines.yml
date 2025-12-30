@@ -1,90 +1,14 @@
-name: AZ-infra-Pipeline
 trigger: none
 
 pool: Babaji
 
-stages:
-# ================= PLANNING =================
-- stage: PlanningStage
-  displayName: Planning Stage
-  jobs:
-    - job: PlanningJob
-      displayName: Terraform Planning
-      steps:
-        - task: TerraformInstaller@1
-          inputs:
-            terraformVersion: 'latest'
+steps:
+- task: CmdLine@2
 
-        - task: TerraformTask@5
-          displayName: Terraform Init
-          inputs:
-            provider: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-            backendServiceArm: 'ado-cicd'
-            backendAzureRmOverrideSubscriptionID: 'a60aa6b9-597f-4824-8c46-46d7412439d3'
-            backendAzureRmResourceGroupName: 'infrargdev'
-            backendAzureRmStorageAccountName: 'infrastgdevo'
-            backendAzureRmContainerName: 'tfstate'
-            backendAzureRmKey: 'dev.terraform.tfstate'
+  displayName: task001
+  inputs:
+    script: |
+      echo Write your commands here
+      
+      echo Hello Guys!!
 
-        - task: TerraformTask@5
-          displayName: Terraform Fmt
-          inputs:
-            provider: 'azurerm'
-            command: 'custom'
-            customCommand: 'fmt'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-            environmentServiceNameAzureRM: 'ado-cicd'
-
-        - task: TerraformTask@5
-          displayName: Terraform Validate
-          inputs:
-            provider: 'azurerm'
-            command: 'validate'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-
-        - task: TerraformTask@5
-          displayName: Terraform Plan
-          inputs:
-            provider: 'azurerm'
-            command: 'plan'
-            commandOptions: '-out=tfplan'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-            environmentServiceNameAzureRM: 'ado-cicd'
-
-        - publish: $(System.DefaultWorkingDirectory)/Environment/Dev/tfplan
-          artifact: terraform-plan
-
-# ================= DEPLOYMENT =================
-- stage: DeploymentStage
-  displayName: Deployment Stage
-  dependsOn: PlanningStage
-  jobs:
-    - job: DeploymentJob
-      displayName: Terraform Apply
-      steps:
-        - download: current
-          artifact: terraform-plan
-
-        - task: TerraformTask@5
-          displayName: Terraform Init
-          inputs:
-            provider: 'azurerm'
-            command: 'init'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-            backendServiceArm: 'ado-cicd'
-            backendAzureRmOverrideSubscriptionID: 'a60aa6b9-597f-4824-8c46-46d7412439d3'
-            backendAzureRmResourceGroupName: 'infrargdev'
-            backendAzureRmStorageAccountName: 'infrastgdevo'
-            backendAzureRmContainerName: 'tfstate'
-            backendAzureRmKey: 'dev.terraform.tfstate'
-
-        - task: TerraformTask@5
-          displayName: Terraform Apply
-          inputs:
-            provider: 'azurerm'
-            command: 'apply'
-            commandOptions: '-auto-approve'
-            workingDirectory: '$(System.DefaultWorkingDirectory)/Environment/Dev'
-            environmentServiceNameAzureRM: 'ado-cicd'
