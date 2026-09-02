@@ -1,95 +1,64 @@
 # Terraform Azure Enterprise Infrastructure
 
-Modular, multi-environment Azure Infrastructure as Code built with Terraform, deployed via an Azure DevOps CI/CD pipeline.
-
-This is a personal project built to design and practice production-style Terraform architecture — reusable modules, environment separation, and pipeline-driven deployment.
-
----
+Modular, multi-environment Azure Infrastructure as Code built with Terraform.
 
 ## What this project demonstrates
 
-- **Modular Terraform design** — infrastructure broken into reusable modules instead of one large configuration file
-- **Multi-environment separation** — isolated Dev and Prod configurations, each with their own variable inputs
-- **Azure DevOps CI/CD pipeline** — automated `terraform init / plan / apply` flow defined in `azure-pipelines.yml`
-- **Version-controlled infrastructure** — every change tracked, reviewable, and repeatable through Git
-
-> ⚠️ Edit note: Fill in the exact resource types below to match what's actually inside `/Modules` — remove anything not present. Don't list AKS, ACR, SQL, etc. unless those module folders genuinely exist in the repo.
-
-## Modules
-
-| Module | Description |
-|---|---|
-| `resource-group` | Provisions the Azure Resource Group container for all resources |
-| `vnet` | Virtual Network and subnet configuration |
-| `nsg` | Network Security Group rules |
-| `key-vault` | Azure Key Vault for secrets management |
-| *(add/remove rows to match actual `/Modules` folder contents)* | |
-
-## Environments
-
-```
-Environment/
-├── Dev/     → development environment variable values
-└── Prod/    → production environment variable values
-```
-
-Each environment references the shared modules above with environment-specific variable values (`.tfvars`), so the same module code deploys consistently across both without duplication.
-
-## CI/CD Pipeline
-
-`azure-pipelines.yml` defines the automated deployment flow:
-
-```
-Code pushed to repo
-        ↓
-Azure DevOps Pipeline triggered
-        ↓
-terraform init
-        ↓
-terraform validate
-        ↓
-terraform plan
-        ↓
-terraform apply
-        ↓
-Azure Infrastructure provisioned
-```
-
-> ⚠️ Edit note: Adjust the steps above if your actual pipeline YAML does something different (e.g., manual approval gate before apply, plan-only on PRs, etc.) — check `azure-pipelines.yml` and match this diagram to it exactly.
+- Reusable Terraform modules
+- Environment separation for Dev and Prod
+- Azure networking and security controls
+- Azure Bastion and Linux virtual machines
+- Key Vault-backed VM and SQL credentials
+- Azure SQL, Storage, ACR and AKS infrastructure
+- Remote-state-ready Terraform workflow
+- Secure secret injection for CI/CD
 
 ## Project structure
 
+```text
+Environment/
+  Dev/
+  Prod/
+Modules/
+  azurerm_resource_group/
+  azurerm_virtual_network/
+  azurerm_network_interface/
+  azurerm_public_ip/
+  azurerm_key_vault/
+  azurerm_virtual_machine/
+  azurerm_bastion_host/
+  azurerm_mssql_server/
+  azurerm_mssql_database/
+  azurerm_storage_account/
+  azurerm_container_registry/
+  azurerm_kubernetes_cluster/
 ```
-.
-├── Environment/
-│   ├── Dev/
-│   └── Prod/
-├── Modules/
-│   └── (see Modules table above)
-├── azure-pipelines.yml
-├── .gitignore
-└── LICENSE
+
+## Security
+
+No passwords are stored in the tracked Dev `.tfvars` file. Sensitive values are supplied through Terraform variables:
+
+```text
+TF_VAR_vm_1_password
+TF_VAR_vm_2_password
+TF_VAR_sql_admin_password
 ```
 
-## State management
+Use a CI/CD secret store or local environment variables. Protect Terraform state because sensitive values can still be present in state.
 
-Remote backend used for Terraform state (Azure Storage Account), enabling state locking and safe collaboration.
+> If the previously committed passwords were real credentials, rotate/revoke them. Removing them from the latest file does not remove them from Git history.
 
-> ⚠️ Edit note: Only keep this section if you're actually using a remote backend (`backend "azurerm" {}` block in your `.tf` files). If state is local, remove this section — a false remote-backend claim is exactly the kind of detail an interviewer might probe on.
-
-## Running locally
+## Terraform workflow
 
 ```bash
 cd Environment/Dev
 terraform init
+terraform fmt -recursive
+terraform validate
 terraform plan
 terraform apply
 ```
 
-## License
+## Production
 
-MIT — see [LICENSE](./LICENSE)
-
----
-
-*Built by [Yesh Pal](https://github.com/yeshpal-devops) — Cloud & Infrastructure Engineer, learning Infrastructure as Code and DevOps automation on Azure.*
+The `Environment/Prod` directory is reserved for environment-specific production configuration. Before applying it, configure its provider, backend, variables and resource inputs independently from Dev. Do not reuse Dev credentials or state.
