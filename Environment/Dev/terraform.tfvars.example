@@ -1,0 +1,9 @@
+# Copy to terraform.tfvars locally. Never commit the real terraform.tfvars.
+# Secrets should be supplied through environment variables or your CI secret store.
+
+# Required secret environment variables:
+# TF_VAR_vm_1_password
+# TF_VAR_vm_2_password
+# TF_VAR_sql_admin_password
+
+# Non-secret configuration can be copied from terraform.tfvars in your local workspace.
