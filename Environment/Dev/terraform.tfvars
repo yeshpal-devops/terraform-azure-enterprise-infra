@@ -72,7 +72,7 @@ dev_nic = {
 }
 
 ################################
-# Virtual Machines (Passwords from KV)
+# Virtual Machines (Passwords from Key Vault)
 ################################
 dev_vm = {
   vm-1 = {
@@ -132,27 +132,7 @@ dev_keyvault = {
 }
 
 ################################
-# Key Vault Secrets
-################################
-vault_secret = {
-  vm-1-password = {
-    name  = "vm-1-password"
-    value = "DevSecOps@25"
-  }
-
-  vm-2-password = {
-    name  = "vm-2-password"
-    value = "DevSecOps@25"
-  }
-
-  sql-admin-password = {
-    name  = "sql-admin-password"
-    value = "P@ssword1234!"
-  }
-}
-
-################################
-# SQL Server (Password from KV)
+# SQL Server (Password from Key Vault)
 ################################
 dev_sql_server = {
   sql = {
@@ -221,3 +201,7 @@ dev_aks = {
     rg_key     = "rg-1"
   }
 }
+
+# Secrets are intentionally not stored in Git.
+# Supply them securely with TF_VAR_vm_1_password,
+# TF_VAR_vm_2_password and TF_VAR_sql_admin_password.
