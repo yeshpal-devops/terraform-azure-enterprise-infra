@@ -25,8 +25,8 @@ module "nic" {
   depends_on = [module.vnet]
   source     = "../../Modules/azurerm_network_interface"
 
-  dev_nic = var.dev_nic
-  dev_rg  = var.dev_rg
+  dev_nic        = var.dev_nic
+  dev_rg         = var.dev_rg
   dev_subnet_ids = module.vnet.subnet_ids
 }
 
@@ -34,8 +34,8 @@ module "nic" {
 # Public IP (ONLY for Bastion)
 ############################
 module "pip" {
-  depends_on    = [module.rg]
-  source        = "../../Modules/azurerm_public_ip"
+  depends_on = [module.rg]
+  source     = "../../Modules/azurerm_public_ip"
 
   dev_public_ip = var.dev_public_ip
   dev_rg        = var.dev_rg
@@ -44,23 +44,39 @@ module "pip" {
 ############################
 # Key Vault + Secrets
 ############################
+locals {
+  vault_secret = {
+    vm-1-password = {
+      name  = "vm-1-password"
+      value = var.vm_1_password
+    }
+    vm-2-password = {
+      name  = "vm-2-password"
+      value = var.vm_2_password
+    }
+    sql-admin-password = {
+      name  = "sql-admin-password"
+      value = var.sql_admin_password
+    }
+  }
+}
+
 module "key_vault" {
-  depends_on   = [module.rg]
-  source       = "../../Modules/azurerm_key_vault"
+  depends_on = [module.rg]
+  source     = "../../Modules/azurerm_key_vault"
 
   dev_keyvault = var.dev_keyvault
-  vault_secret = var.vault_secret
+  vault_secret = local.vault_secret
   dev_rg       = var.dev_rg
 }
 
 ############################
 # Virtual Machines (Passwords from Key Vault)
 ############################
-
 locals {
   dev_vm_enriched = {
     for k, v in var.dev_vm : k => merge(v, {
-      resource_group_name = var.dev_rg[v.rg_key].name,
+      resource_group_name = var.dev_rg[v.rg_key].name
       location            = var.dev_rg[v.rg_key].location
     })
   }
@@ -74,11 +90,9 @@ module "vm" {
   depends_on = [module.nic, module.key_vault]
   source     = "../../Modules/azurerm_virtual_machine"
 
-  dev_vm        = local.dev_vm_enriched
-  key_vault_id  = local.vm_key_vault_map
-
+  dev_vm       = local.dev_vm_enriched
+  key_vault_id = local.vm_key_vault_map
 }
-
 
 ############################
 # Azure Bastion Host
@@ -87,9 +101,9 @@ module "azure_bastion" {
   depends_on = [module.vnet, module.pip]
   source     = "../../Modules/azurerm_bastion_host"
 
-  dev_bastion = var.dev_bastion
-  dev_rg = var.dev_rg
-  dev_subnet_ids = module.vnet.subnet_ids
+  dev_bastion     = var.dev_bastion
+  dev_rg          = var.dev_rg
+  dev_subnet_ids  = module.vnet.subnet_ids
   dev_public_ip_ids = module.pip.public_ip_ids
 }
 
@@ -97,8 +111,8 @@ module "azure_bastion" {
 # SQL Server (Password from Key Vault)
 ############################
 module "sql_server" {
-  depends_on     = [module.key_vault]
-  source         = "../../Modules/azurerm_mssql_server"
+  depends_on   = [module.key_vault]
+  source       = "../../Modules/azurerm_mssql_server"
 
   dev_sql_server = var.dev_sql_server
   dev_rg         = var.dev_rg
@@ -108,7 +122,6 @@ module "sql_server" {
 ############################
 # SQL Database
 ############################
-
 locals {
   db_server_ids = {
     for db_k, db_v in var.dev_sql_database :
@@ -117,19 +130,19 @@ locals {
 }
 
 module "sql_database" {
-  depends_on           = [module.sql_server]
-  source               = "../../Modules/azurerm_mssql_database"
+  depends_on         = [module.sql_server]
+  source             = "../../Modules/azurerm_mssql_database"
 
-  dev_sql_database     = var.dev_sql_database
-  dev_sql_server_ids   = local.db_server_ids
+  dev_sql_database   = var.dev_sql_database
+  dev_sql_server_ids = local.db_server_ids
 }
 
 ############################
 # Storage Account
 ############################
 module "storage_account" {
-  depends_on  = [module.rg]
-  source      = "../../Modules/azurerm_storage_account"
+  depends_on = [module.rg]
+  source     = "../../Modules/azurerm_storage_account"
 
   dev_storage = var.dev_storage
   dev_rg      = var.dev_rg
