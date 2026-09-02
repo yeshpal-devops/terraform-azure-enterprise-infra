@@ -1,74 +1,87 @@
 variable "dev_rg" {
-  type = map(any)
+  description = "Development resource groups."
+  type        = map(any)
 }
-
 
 variable "dev_vnet" {
-  type = map(any)
+  description = "Development virtual network configuration."
+  type        = map(any)
 }
-
 
 variable "dev_subnet" {
-  type = map(any)
+  description = "Development subnet configuration."
+  type        = map(any)
 }
-
 
 variable "dev_nsg" {
-  type = map(any)
+  description = "Development network security groups."
+  type        = map(any)
 }
-
 
 variable "dev_public_ip" {
-  type = map(any)
+  description = "Development public IP configuration."
+  type        = map(any)
 }
-
 
 variable "dev_nic" {
-  type = map(any)
+  description = "Development network interface configuration."
+  type        = map(any)
 }
-
 
 variable "dev_vm" {
-  type = map(any)
+  description = "Development VM configuration."
+  type        = map(any)
 }
 
-
 variable "dev_bastion" {
-  type = map(any)
+  description = "Development Azure Bastion configuration."
+  type        = map(any)
 }
 
 variable "dev_storage" {
-  type = map(any)
+  description = "Development storage account configuration."
+  type        = map(any)
 }
-
 
 variable "dev_acr" {
-  type = map(any)
+  description = "Development Azure Container Registry configuration."
+  type        = map(any)
 }
-
-
 
 variable "dev_aks" {
-  type = map(any)
+  description = "Development AKS configuration."
+  type        = map(any)
 }
-
-
 
 variable "dev_keyvault" {
-  type = map(any)
-}
-
-variable "vault_secret" {
-  type = map(any)
+  description = "Development Key Vault configuration."
+  type        = map(any)
 }
 
 variable "dev_sql_server" {
-  type = map(any)
+  description = "Development SQL Server configuration."
+  type        = map(any)
 }
-
-
 
 variable "dev_sql_database" {
-  type = map(any)
+  description = "Development SQL database configuration."
+  type        = map(any)
 }
 
+variable "vm_1_password" {
+  description = "Password for development VM 1. Inject through TF_VAR_vm_1_password or a CI secret."
+  type        = string
+  sensitive   = true
+}
+
+variable "vm_2_password" {
+  description = "Password for development VM 2. Inject through TF_VAR_vm_2_password or a CI secret."
+  type        = string
+  sensitive   = true
+}
+
+variable "sql_admin_password" {
+  description = "Password for the development SQL administrator. Inject through TF_VAR_sql_admin_password or a CI secret."
+  type        = string
+  sensitive   = true
+}
