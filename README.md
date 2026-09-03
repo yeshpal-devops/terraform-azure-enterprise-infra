@@ -1,6 +1,49 @@
 # Terraform Azure Enterprise Infrastructure
 
+![Azure](https://img.shields.io/badge/Azure-Cloud-0078D4?logo=microsoftazure&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?logo=terraform&logoColor=white)
+![Infrastructure](https://img.shields.io/badge/Infrastructure-Modular-0A0A0A)
+
 Modular, multi-environment Azure Infrastructure as Code built with Terraform.
+
+## Architecture
+
+The project provisions a structured Azure environment using reusable Terraform modules, with networking, secure administration, secrets management and platform services.
+
+```text
+                         Azure Subscription
+                                |
+                         +------+------+
+                         | Resource    |
+                         |   Group     |
+                         +------+------+
+                                |
+                    +-----------+-----------+
+                    |                       |
+               +----v----+             +---v----+
+               |   VNet  |             |Key Vault|
+               |10.0.0/16|             | Secrets |
+               +----+----+             +--------+
+                    |
+             +------+------+
+             |             |
+        +----v----+   +----v----------------+
+        | VM Subnet|   | AzureBastionSubnet |
+        | VM-1/VM-2|   | Bastion + Public IP|
+        +----+----+   +--------------------+
+             |
+       +-----+-----+
+       |           |
+   +---v---+   +---v---+
+   | Linux |   | Linux |
+   |  VM-1 |   |  VM-2 |
+   +-------+   +-------+
+
+ Additional platform services:
+ Azure SQL | Storage | ACR | AKS
+```
+
+For a larger, easier-to-read architecture view, see [`docs/architecture.md`](./docs/architecture.md).
 
 ## What this project demonstrates
 
@@ -32,6 +75,8 @@ Modules/
   azurerm_storage_account/
   azurerm_container_registry/
   azurerm_kubernetes_cluster/
+docs/
+  architecture.md
 ```
 
 ## Security
@@ -46,7 +91,7 @@ TF_VAR_sql_admin_password
 
 Use a CI/CD secret store or local environment variables. Protect Terraform state because sensitive values can still be present in state.
 
-> If the previously committed passwords were real credentials, rotate/revoke them. Removing them from the latest file does not remove them from Git history.
+> If previously committed passwords were real credentials, rotate/revoke them. Removing them from the latest file does not remove them from Git history.
 
 ## Terraform workflow
 
@@ -62,3 +107,7 @@ terraform apply
 ## Production
 
 The `Environment/Prod` directory is reserved for environment-specific production configuration. Before applying it, configure its provider, backend, variables and resource inputs independently from Dev. Do not reuse Dev credentials or state.
+
+---
+
+Built with Terraform and Microsoft Azure.
