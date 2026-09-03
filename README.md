@@ -1,41 +1,38 @@
 # Terraform Azure Enterprise Infrastructure
 
-![Azure](https://img.shields.io/badge/Microsoft%20Azure-Cloud-0078D4?logo=microsoftazure&logoColor=white)
-![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?logo=terraform&logoColor=white)
-![Azure DevOps](https://img.shields.io/badge/Azure%20DevOps-CI%2FCD-0078D7?logo=azuredevops&logoColor=white)
-![AKS](https://img.shields.io/badge/AKS-Kubernetes-326CE5?logo=kubernetes&logoColor=white)
-![Security](https://img.shields.io/badge/Security-Key%20Vault-16A34A?logo=microsoftazure&logoColor=white)
+<p align="center">
+  <img src="https://img.shields.io/badge/Microsoft%20Azure-Cloud-0078D4?logo=microsoftazure&logoColor=white" alt="Azure" />
+  <img src="https://img.shields.io/badge/Terraform-IaC-7B42BC?logo=terraform&logoColor=white" alt="Terraform" />
+  <img src="https://img.shields.io/badge/Azure%20DevOps-CI%2FCD-0078D7?logo=azuredevops&logoColor=white" alt="Azure DevOps" />
+  <img src="https://img.shields.io/badge/AKS-Kubernetes-326CE5?logo=kubernetes&logoColor=white" alt="AKS" />
+  <img src="https://img.shields.io/badge/Key%20Vault-Security-16A34A?logo=microsoftazure&logoColor=white" alt="Key Vault" />
+  <img src="https://img.shields.io/badge/Monitoring-Log%20Analytics-5C2D91?logo=microsoftazure&logoColor=white" alt="Monitoring" />
+</p>
 
-> **Production-style Azure Infrastructure as Code portfolio project** built with reusable Terraform modules, environment separation, secure administration, secrets management and core Azure platform services.
+> **Production-style Azure Infrastructure as Code portfolio project** built with reusable Terraform modules, environment separation, secure administration, secrets management, Kubernetes and observability.
 
 ![Azure Architecture](./docs/architecture.svg)
 
 ## 🚀 Project Overview
 
-This repository demonstrates how a cloud infrastructure engineer can design and organize a modular Azure environment using Terraform rather than managing resources manually.
+This project demonstrates how to design and manage a modular Azure environment with Terraform instead of manually creating cloud resources.
 
-The current implementation includes:
+### Current Azure resources
 
-- Modular Terraform architecture
-- Separate Dev and Prod environment structure
-- Azure Virtual Network and segmented subnets
-- Network Interfaces and Network Security Group structure
-- Azure Bastion for private VM administration
-- Linux virtual machines
-- Azure Key Vault for credential storage
-- Azure SQL Server and Database
-- Azure Storage Account
-- Azure Container Registry (ACR)
-- Azure Kubernetes Service (AKS)
-- Secure secret injection for Terraform execution
+| Area | Resources |
+|---|---|
+| 🌐 Networking | VNet, subnets, NICs, NSG structure |
+| 🔐 Security | Key Vault, Azure Bastion, secure secret injection |
+| 🖥️ Compute | Linux Virtual Machines |
+| 🗄️ Data | Azure SQL Server + Database |
+| 📦 Storage | Azure Storage Account |
+| 🐳 Containers | Azure Container Registry (ACR) |
+| ☸️ Kubernetes | Azure Kubernetes Service (AKS) |
+| 📊 Monitoring | Log Analytics Workspace |
 
 ## 🏗️ Architecture
 
-The environment is organized around an Azure Resource Group with a dedicated VNet. Workloads are isolated into VM subnets, while Azure Bastion provides administrative access without exposing the workload VMs through public IP addresses.
-
-Key platform services such as Key Vault, Azure SQL, Storage, ACR and AKS are provisioned through reusable modules.
-
-### Architecture flow
+The Dev environment uses a dedicated VNet with workload subnets and an `AzureBastionSubnet`. VM administration is designed through Azure Bastion rather than public IPs on the workload VMs. Key Vault provides credential storage, while SQL, Storage, ACR, AKS and Log Analytics provide application-platform capabilities.
 
 ```text
                          Azure Subscription
@@ -45,30 +42,30 @@ Key platform services such as Key Vault, Azure SQL, Storage, ACR and AKS are pro
                          │    Group    │
                          └──────┬──────┘
                                 │
-              ┌─────────────────┴─────────────────┐
-              │                                   │
-        ┌─────▼─────┐                       ┌─────▼─────┐
-        │    VNet   │                       │ Key Vault │
-        │ 10.0.0/16 │                       │  Secrets  │
-        └─────┬─────┘                       └───────────┘
-              │
-       ┌──────┴─────────┐
-       │                │
- ┌─────▼─────┐   ┌──────▼──────────────┐
- │ VM Subnet │   │ AzureBastionSubnet   │
- │ VM-1/VM-2 │   │ Bastion + Public IP  │
- └─────┬─────┘   └─────────────────────┘
-       │
-  ┌────┴────┐
-  │         │
-┌─▼────┐ ┌──▼────┐
-│ VM-1  │ │ VM-2  │
-└───────┘ └───────┘
+        ┌───────────────────────┼────────────────────────┐
+        │                       │                        │
+   ┌────▼─────┐           ┌─────▼─────┐          ┌──────▼──────┐
+   │   VNet   │           │ Key Vault  │          │ Log Analytics│
+   │ 10.0.0/16│           │  Secrets   │          │  Monitoring  │
+   └────┬─────┘           └────────────┘          └─────────────┘
+        │
+   ┌────┴───────────────────┐
+   │                        │
+┌──▼─────────┐       ┌──────▼──────────────┐
+│ VM Subnets │       │ AzureBastionSubnet  │
+│ VM-1 / VM-2│       │ Bastion + Public IP │
+└────┬───────┘       └─────────────────────┘
+     │
+ ┌───┴────┐
+ │        │
+▼        ▼
+VM-1    VM-2
 
-   Azure SQL | Storage | ACR | AKS
+ Azure SQL | Storage | ACR | AKS
 ```
 
-For the visual architecture diagram, see [`docs/architecture.svg`](./docs/architecture.svg). A text version is also available in [`docs/architecture.md`](./docs/architecture.md).
+📐 Full visual architecture: [`docs/architecture.svg`](./docs/architecture.svg)  
+📖 Text architecture: [`docs/architecture.md`](./docs/architecture.md)
 
 ## 📁 Repository Structure
 
@@ -76,15 +73,7 @@ For the visual architecture diagram, see [`docs/architecture.svg`](./docs/archit
 .
 ├── Environment/
 │   ├── Dev/
-│   │   ├── main.tf
-│   │   ├── provider.tf
-│   │   ├── variables.tf
-│   │   └── terraform.tfvars
 │   └── Prod/
-│       ├── main.tf
-│       ├── provider.tf
-│       ├── variables.tf
-│       └── terraform.tfvars
 │
 ├── Modules/
 │   ├── azurerm_resource_group/
@@ -98,21 +87,23 @@ For the visual architecture diagram, see [`docs/architecture.svg`](./docs/archit
 │   ├── azurerm_mssql_database/
 │   ├── azurerm_storage_account/
 │   ├── azurerm_container_registry/
-│   └── azurerm_kubernetes_cluster/
+│   ├── azurerm_kubernetes_cluster/
+│   └── azurerm_log_analytics/
 │
 ├── docs/
 │   ├── architecture.md
 │   └── architecture.svg
 │
-├── .gitignore
 └── README.md
 ```
 
-## 🔐 Security & Secret Management
+## 🔐 Security
 
-Credentials are **not stored as plaintext values in the tracked Dev tfvars configuration**.
-
-Secrets are expected to be supplied securely through Terraform variables such as:
+- No plaintext passwords are stored in the tracked Dev `.tfvars` configuration.
+- VM and SQL credentials are injected through sensitive Terraform variables.
+- Azure Bastion is used for private VM administration.
+- AKS uses a SystemAssigned managed identity by default.
+- Terraform state must be protected because sensitive values can still exist in state.
 
 ```text
 TF_VAR_vm_1_password
@@ -120,9 +111,13 @@ TF_VAR_vm_2_password
 TF_VAR_sql_admin_password
 ```
 
-For CI/CD, use a secure secret store or pipeline secret variables. Protect Terraform state because sensitive values may still be represented in state even when input variables are marked sensitive.
+> ⚠️ If the previously committed credentials were real, rotate/revoke them. Removing a secret from the latest commit does not remove it from Git history.
 
-> ⚠️ Previously committed credentials should be rotated/revoked if they were real. Removing a secret from the latest file does not remove it from Git history.
+## 📊 Observability
+
+A reusable **Log Analytics Workspace** is now included in the Dev environment as the foundation for centralized Azure monitoring and diagnostics.
+
+The next monitoring step is to connect diagnostic settings from AKS, Key Vault, SQL and other resources to the workspace.
 
 ## ⚙️ Terraform Workflow
 
@@ -135,7 +130,7 @@ terraform plan
 terraform apply
 ```
 
-### Secure variable example
+### Secure local variables
 
 ```bash
 export TF_VAR_vm_1_password='********'
@@ -143,44 +138,51 @@ export TF_VAR_vm_2_password='********'
 export TF_VAR_sql_admin_password='********'
 ```
 
+For CI/CD, use a secure pipeline secret store rather than committing credentials.
+
 ## 🌍 Environment Strategy
 
 ```text
 Environment/
-├── Dev   → development / learning environment
+├── Dev   → development / portfolio environment
 └── Prod  → production-oriented environment structure
 ```
 
-The environment folders are intentionally separated so that resource inputs, state and authentication configuration can evolve independently.
+Dev and Prod are separated so resource inputs, state and authentication can evolve independently.
 
-## 💼 What This Project Shows Interviewers
+## 💼 What This Project Demonstrates
 
-- How to structure reusable Terraform modules
-- How to separate infrastructure by environment
-- How to design Azure networking and private administrative access
-- How to handle secrets more securely
-- How to provision both traditional VM workloads and container platforms
-- How to organize Terraform for repeatable cloud deployments
-- How Azure services can be composed into one enterprise-style environment
+- Reusable Terraform module design
+- Multi-environment infrastructure structure
+- Azure networking and secure administration
+- Key Vault-based secret management
+- AKS and container platform provisioning
+- Azure SQL and storage provisioning
+- Centralized monitoring foundation with Log Analytics
+- Infrastructure automation and repeatable deployments
+- Security-conscious Infrastructure as Code practices
 
-## 🧩 Future Enhancements
+## 🛣️ Roadmap
 
-The next logical production-grade additions are:
+- [x] Modular Terraform architecture
+- [x] Dev environment
+- [x] Azure Bastion + private VM administration
+- [x] Key Vault secret handling
+- [x] AKS + ACR
+- [x] Azure SQL + Storage
+- [x] Log Analytics monitoring foundation
+- [ ] Diagnostic settings for Azure resources
+- [ ] Private Endpoints + Private DNS
+- [ ] OIDC / workload identity for CI/CD
+- [ ] Checkov security scanning
+- [ ] Azure Policy / policy-as-code
+- [ ] Fully implemented Prod environment
+- [ ] Production-grade remote backend per environment
 
-- Terraform remote backend configuration per environment
-- Azure DevOps pipeline with `fmt`, `validate`, `plan`, approval and `apply`
-- OIDC/workload identity for pipeline authentication
-- Terraform security scanning with Checkov or tfsec
-- Azure Monitor / Log Analytics integration
-- Managed identities for Azure workloads
-- Private endpoints and tighter network isolation
-- Policy-as-code and Azure Policy controls
-- Fully implemented Prod resource inputs and deployment workflow
+## ⭐ Why this repository matters
 
-## 📌 Project Status
-
-**Development / portfolio project — actively improving toward a production-grade Azure IaC reference implementation.**
+This is intentionally more than a collection of Terraform examples. It is structured as an **enterprise-style Azure platform project** that demonstrates networking, security, compute, data, containers, Kubernetes, monitoring and Infrastructure as Code in one architecture.
 
 ---
 
-Built with **Terraform + Microsoft Azure** by Yesh Pal.
+**Terraform + Microsoft Azure** · Built by **Yesh Pal**
