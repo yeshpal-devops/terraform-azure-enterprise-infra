@@ -68,6 +68,11 @@ variable "dev_sql_database" {
   type        = map(any)
 }
 
+variable "log_analytics" {
+  description = "Development Log Analytics workspace configuration."
+  type        = map(any)
+}
+
 variable "vm_1_password" {
   description = "Password for development VM 1. Inject through TF_VAR_vm_1_password or a CI secret."
   type        = string
