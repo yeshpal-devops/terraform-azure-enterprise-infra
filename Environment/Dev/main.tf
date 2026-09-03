@@ -71,6 +71,16 @@ module "key_vault" {
 }
 
 ############################
+# Monitoring / Observability
+############################
+module "log_analytics" {
+  depends_on    = [module.rg]
+  source        = "../../Modules/azurerm_log_analytics"
+  log_analytics = var.log_analytics
+  dev_rg        = var.dev_rg
+}
+
+############################
 # Virtual Machines (Passwords from Key Vault)
 ############################
 locals {
@@ -101,9 +111,9 @@ module "azure_bastion" {
   depends_on = [module.vnet, module.pip]
   source     = "../../Modules/azurerm_bastion_host"
 
-  dev_bastion     = var.dev_bastion
-  dev_rg          = var.dev_rg
-  dev_subnet_ids  = module.vnet.subnet_ids
+  dev_bastion       = var.dev_bastion
+  dev_rg            = var.dev_rg
+  dev_subnet_ids    = module.vnet.subnet_ids
   dev_public_ip_ids = module.pip.public_ip_ids
 }
 
@@ -111,8 +121,8 @@ module "azure_bastion" {
 # SQL Server (Password from Key Vault)
 ############################
 module "sql_server" {
-  depends_on   = [module.key_vault]
-  source       = "../../Modules/azurerm_mssql_server"
+  depends_on     = [module.key_vault]
+  source         = "../../Modules/azurerm_mssql_server"
 
   dev_sql_server = var.dev_sql_server
   dev_rg         = var.dev_rg
