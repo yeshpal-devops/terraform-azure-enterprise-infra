@@ -72,7 +72,7 @@ dev_nic = {
 }
 
 ################################
-# Virtual Machines (Passwords from Key Vault)
+# Virtual Machines
 ################################
 dev_vm = {
   vm-1 = {
@@ -132,7 +132,7 @@ dev_keyvault = {
 }
 
 ################################
-# SQL Server (Password from Key Vault)
+# SQL Server
 ################################
 dev_sql_server = {
   sql = {
@@ -199,6 +199,18 @@ dev_aks = {
     node_count = 3
     vm_size    = "Standard_B2s"
     rg_key     = "rg-1"
+  }
+}
+
+################################
+# Monitoring / Log Analytics
+################################
+log_analytics = {
+  workspace-1 = {
+    name              = "dev-log-analytics-042026"
+    sku               = "PerGB2018"
+    retention_in_days = 30
+    rg_key            = "rg-1"
   }
 }
 
